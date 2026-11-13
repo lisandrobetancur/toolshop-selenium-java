@@ -1,0 +1,158 @@
+name: E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: "Expresión de etiquetas JUnit (por ejemplo smoke, F06 | F07). Vacío = todas."
+        required: false
+        default: ""
+      safari:
+        description: "Ejecutar también en Safari (runner macOS)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CI: "true"
+  HEADLESS: "true"
+  # Por defecto, el sitio público. Los jobs de Ubuntu lo reemplazan por Toolshop en Docker.
+  BASE_URL: https://practicesoftwaretesting.com
+  API_URL: https://api.practicesoftwaretesting.com
+  ADMIN_EMAIL: admin@practicesoftwaretesting.com
+  ADMIN_PASSWORD: ${{ secrets.TOOLSHOP_ADMIN_PASSWORD }}
+  TAGS: ${{ github.event.inputs.tags }}
+
+jobs:
+  quality:
+    name: Formato, lint y tipado
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-java@v6.2.0
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: gradle/actions/setup-gradle@v6.4.1
+      - name: Spotless + Error Prone + NullAway
+        run: ./gradlew spotlessCheck compileTestJava
+
+  e2e:
+    name: E2E (${{ matrix.browser }})
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox, edge]
+    env:
+      BROWSER: ${{ matrix.browser }}
+      PARALLELISM: "4"
+      # Toolshop local en Docker: el sitio público está detrás de Cloudflare, que bloquea a los
+      # navegadores headless que corren desde los IPs de GitHub Actions.
+      BASE_URL: http://localhost:4200
+      API_URL: http://localhost:8091
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-java@v6.2.0
+        with:
+          distribution: temurin
+          java-version: "25"
+      # Caché de dependencias y del wrapper de Gradle.
+      - uses: gradle/actions/setup-gradle@v6.4.1
+      # Historial de Allure entre ejecuciones (pestaña Trend y reintentos previos).
+      - name: Restaurar historial de Allure
+        uses: actions/cache@v6.1.0
+        with:
+          path: build/reports/allure-report/allureReport/history
+          key: allure-history-${{ matrix.browser }}-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            allure-history-${{ matrix.browser }}-${{ github.ref_name }}-
+            allure-history-${{ matrix.browser }}-
+      - name: Levantar Toolshop en Docker
+        run: ci/toolshop/start.sh
+      # Los navegadores vienen en la imagen de Ubuntu; Selenium Manager resuelve los drivers.
+      - name: Ejecutar pruebas
+        run: |
+          if [ -n "$TAGS" ]; then
+            ./gradlew test "-PincludeTags=$TAGS"
+          else
+            ./gradlew test
+          fi
+      - name: Publicar reporte Allure
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: allure-report-${{ matrix.browser }}
+          path: build/reports/allure-report/allureReport
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Logs de Toolshop
+        if: failure()
+        run: docker compose -f ci/toolshop/docker-compose.yml logs --no-color --tail 200
+      - name: Publicar resultados crudos
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: allure-results-${{ matrix.browser }}
+          path: |
+            build/allure-results
+            build/test-results/test
+          if-no-files-found: warn
+          retention-days: 14
+
+  # Los runners macOS no traen Docker: Safari corre contra el sitio público y puede chocar con la
+  # verificación de Cloudflare.
+  safari:
+    name: E2E (safari, macOS)
+    needs: quality
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.safari == 'true'
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      BROWSER: safari
+      # safaridriver admite una sola sesión a la vez.
+      PARALLELISM: "1"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-java@v6.2.0
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: gradle/actions/setup-gradle@v6.4.1
+      # Historial de Allure entre ejecuciones (pestaña Trend y reintentos previos).
+      - name: Restaurar historial de Allure
+        uses: actions/cache@v6.1.0
+        with:
+          path: build/reports/allure-report/allureReport/history
+          key: allure-history-safari-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            allure-history-safari-${{ github.ref_name }}-
+            allure-history-safari-
+      - name: Habilitar safaridriver
+        run: sudo safaridriver --enable
+      - name: Ejecutar pruebas
+        run: |
+          if [ -n "$TAGS" ]; then
+            ./gradlew test "-PincludeTags=$TAGS"
+          else
+            ./gradlew test
+          fi
+      - name: Publicar reporte Allure
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: allure-report-safari
+          path: build/reports/allure-report/allureReport
+          if-no-files-found: warn
+          retention-days: 14

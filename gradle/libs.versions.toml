@@ -1,0 +1,42 @@
+# Versiones exactas, consultadas en Maven Central / Gradle Plugin Portal el 2026-11-12.
+[versions]
+java = "25"
+selenium = "4.52.0"
+junit = "6.1.3"
+assertj = "3.27.7"
+allure-java = "3.1.1"
+allure-report = "2.46.2"
+jackson = "3.3.0"
+datafaker = "2.7.0"
+dotenv = "3.2.0"
+slf4j = "2.0.20"
+logback = "1.6.6"
+errorprone = "2.52.0"
+nullaway = "0.14.3"
+jspecify = "1.0.1"
+google-java-format = "2.0.0"
+aspectj = "1.9.27"
+
+[libraries]
+selenium-java = { module = "org.seleniumhq.selenium:selenium-java", version.ref = "selenium" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+allure-bom = { module = "io.qameta.allure:allure-bom", version.ref = "allure-java" }
+allure-jupiter = { module = "io.qameta.allure:allure-jupiter" }
+jackson-databind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson" }
+datafaker = { module = "net.datafaker:datafaker", version.ref = "datafaker" }
+dotenv = { module = "io.github.cdimascio:dotenv-java", version.ref = "dotenv" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
+nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
+aspectjweaver = { module = "org.aspectj:aspectjweaver", version.ref = "aspectj" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version = "8.11.0" }
+errorprone = { id = "net.ltgt.errorprone", version = "5.2.0" }
+allure-report = { id = "io.qameta.allure-report", version = "4.3.1" }
+test-retry = { id = "org.gradle.test-retry", version = "1.6.6" }
