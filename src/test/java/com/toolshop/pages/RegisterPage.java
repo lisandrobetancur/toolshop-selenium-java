@@ -2,6 +2,9 @@ package com.toolshop.pages;
 
 import com.toolshop.data.Address;
 import com.toolshop.data.User;
+import io.qameta.allure.Param;
+import io.qameta.allure.Step;
+import io.qameta.allure.model.Parameter;
 import org.jspecify.annotations.Nullable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -28,6 +31,7 @@ public final class RegisterPage extends BasePage {
     super(driver);
   }
 
+  @Step("Abrir el registro")
   public RegisterPage open() {
     navigateTo("/auth/register");
     waits.visible(SUBMIT);
@@ -38,6 +42,7 @@ public final class RegisterPage extends BasePage {
    * Llena el formulario completo. Calle, ciudad y estado no se escriben: la aplicación los
    * autocompleta a partir de país, código postal y número, y se espera a que lo haga.
    */
+  @Step("Completar el registro de {user}")
   public RegisterPage fillForm(User user) {
     type(FIRST_NAME, user.firstName());
     type(LAST_NAME, user.lastName());
@@ -49,17 +54,21 @@ public final class RegisterPage extends BasePage {
     return this;
   }
 
-  public RegisterPage typePassword(String password) {
+  @Step("Reemplazar la contraseña")
+  public RegisterPage typePassword(
+      @Param(name = "password", mode = Parameter.Mode.MASKED) String password) {
     type(PASSWORD, password);
     return this;
   }
 
+  @Step("Enviar el registro")
   public RegisterPage submit() {
     click(SUBMIT);
     return this;
   }
 
   /** Tras un registro correcto la aplicación lleva al formulario de inicio de sesión. */
+  @Step("Esperar la redirección al login")
   public LoginPage waitForRedirectToLogin() {
     waits.urlContains("/auth/login");
     return new LoginPage(driver);

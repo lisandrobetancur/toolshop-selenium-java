@@ -1,6 +1,7 @@
 package com.toolshop.components;
 
 import com.toolshop.pages.BasePage;
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -27,12 +28,14 @@ public final class Header extends BasePage {
     return !isDisplayed(USER_MENU);
   }
 
+  @Step("Cerrar sesión")
   public void signOut() {
     click(USER_MENU);
     click(SIGN_OUT);
     waits.visible(SIGN_IN);
   }
 
+  @Step("Abrir la opción \"{dataTest}\" del menú de usuario")
   public void openMenuItem(String dataTest) {
     click(USER_MENU);
     click(byTest(dataTest));
@@ -43,12 +46,14 @@ public final class Header extends BasePage {
     return Integer.parseInt(textOf(CART_QUANTITY));
   }
 
+  @Step("Esperar que el carrito del encabezado muestre {expected} unidades")
   public void waitForCartQuantity(int expected) {
     waits.until(
         "que el carrito del encabezado muestre " + expected + " unidades",
         d -> String.valueOf(expected).equals(d.findElement(CART_QUANTITY).getText().trim()));
   }
 
+  @Step("Abrir el carrito desde el encabezado")
   public void openCart() {
     click(CART_LINK);
   }

@@ -2,6 +2,7 @@ package com.toolshop.pages;
 
 import com.toolshop.components.Pagination;
 import com.toolshop.support.Money;
+import io.qameta.allure.Step;
 import java.math.BigDecimal;
 import java.util.List;
 import org.openqa.selenium.By;
@@ -27,36 +28,42 @@ public final class CatalogPage extends BasePage {
     this.pagination = new Pagination(driver);
   }
 
+  @Step("Abrir el catálogo")
   public CatalogPage open() {
     navigateTo("/");
     waits.visible(PRODUCT_NAMES);
     return this;
   }
 
+  @Step("Buscar \"{term}\"")
   public CatalogPage searchFor(String term) {
     type(SEARCH_QUERY, term);
     click(SEARCH_SUBMIT);
     return this;
   }
 
+  @Step("Limpiar la búsqueda")
   public CatalogPage resetSearch() {
     click(SEARCH_RESET);
     return this;
   }
 
   /** Marca o desmarca el filtro de una categoría. */
+  @Step("Alternar el filtro de categoría {categoryId}")
   public CatalogPage toggleCategory(String categoryId) {
     click(byTest("category-" + categoryId));
     return this;
   }
 
   /** Marca o desmarca el filtro de una marca. */
+  @Step("Alternar el filtro de marca {brandId}")
   public CatalogPage toggleBrand(String brandId) {
     click(byTest("brand-" + brandId));
     return this;
   }
 
   /** Ordena con un criterio de la aplicación, por ejemplo {@code name,asc} o {@code price,desc}. */
+  @Step("Ordenar por {criterion}")
   public CatalogPage sortBy(String criterion) {
     selectByValue(SORT, criterion);
     return this;
@@ -66,6 +73,7 @@ public final class CatalogPage extends BasePage {
     return pagination;
   }
 
+  @Step("Abrir el producto {productId} desde el catálogo")
   public ProductPage openProduct(String productId) {
     click(byTest("product-" + productId));
     return new ProductPage(driver);

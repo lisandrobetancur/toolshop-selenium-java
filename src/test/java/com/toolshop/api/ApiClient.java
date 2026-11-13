@@ -1,6 +1,7 @@
 package com.toolshop.api;
 
 import com.toolshop.config.Config;
+import io.qameta.allure.Allure;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -63,10 +64,23 @@ public final class ApiClient {
 
   /** Estado HTTP de una petición, sin lanzar excepción por estados de error. */
   public int status(String method, String path, @Nullable Object body) {
-    return exchange(method, path, body).statusCode();
+    return Allure.step(
+        "API " + method + " " + withoutQuery(path) + " (estado esperado)",
+        () -> exchange(method, path, body).statusCode());
   }
 
+  /** Cada llamada aparece como paso del reporte, para ver qué datos preparó la prueba. */
   private JsonNode send(String method, String path, @Nullable Object body) {
+    return Allure.step(
+        "API " + method + " " + withoutQuery(path), () -> doSend(method, path, body));
+  }
+
+  private static String withoutQuery(String path) {
+    int query = path.indexOf('?');
+    return query < 0 ? path : path.substring(0, query);
+  }
+
+  private JsonNode doSend(String method, String path, @Nullable Object body) {
     HttpResponse<String> response = exchange(method, path, body);
     if (response.statusCode() >= 400) {
       throw new ApiException(

@@ -1,6 +1,7 @@
 package com.toolshop.components;
 
 import com.toolshop.pages.BasePage;
+import io.qameta.allure.Step;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -16,6 +17,7 @@ public final class Toast extends BasePage {
   }
 
   /** Espera a que aparezca una notificación con exactamente ese texto. */
+  @Step("Esperar la notificación \"{message}\"")
   public void waitFor(String message) {
     waits.until(
         "una notificación con el texto '" + message + "'", d -> messages(d).contains(message));

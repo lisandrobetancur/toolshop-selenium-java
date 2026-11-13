@@ -2,6 +2,7 @@ package com.toolshop.components;
 
 import com.toolshop.pages.BasePage;
 import com.toolshop.support.Money;
+import io.qameta.allure.Step;
 import java.math.BigDecimal;
 import java.util.List;
 import org.openqa.selenium.By;
@@ -46,6 +47,7 @@ public final class CartTable extends BasePage {
   }
 
   /** Cambia la cantidad de un producto y confirma el campo, como al salir de él con Tab. */
+  @Step("Cambiar la cantidad de \"{product}\" a {quantity}")
   public void setQuantity(String product, int quantity) {
     String expectedLabel = "Quantity for " + product;
     String inputId =
@@ -62,6 +64,7 @@ public final class CartTable extends BasePage {
     overwrite(By.id(inputId), String.valueOf(quantity) + Keys.TAB);
   }
 
+  @Step("Eliminar \"{product}\" del carrito")
   public void remove(String product) {
     waits.until(
         "poder eliminar '" + product + "' del carrito",

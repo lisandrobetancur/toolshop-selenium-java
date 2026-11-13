@@ -1,6 +1,7 @@
 package com.toolshop.pages.admin;
 
 import com.toolshop.pages.BasePage;
+import io.qameta.allure.Step;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -21,6 +22,7 @@ public final class AdminOrderPage extends BasePage {
   }
 
   /** Abre el pedido y espera a que cargue su número de factura. */
+  @Step("Abrir el pedido {invoiceId} como administrador")
   public AdminOrderPage open(String invoiceId) {
     navigateTo("/admin/orders/edit/" + invoiceId);
     waits.until(
@@ -43,11 +45,13 @@ public final class AdminOrderPage extends BasePage {
         .getOptions().stream().filter(WebElement::isEnabled).map(o -> o.getText().trim()).toList();
   }
 
+  @Step("Elegir el estado {status}")
   public AdminOrderPage chooseStatus(String status) {
     selectByValue(STATUS, status);
     return this;
   }
 
+  @Step("Actualizar el estado del pedido")
   public AdminOrderPage submitStatus() {
     click(UPDATE_STATUS);
     return this;

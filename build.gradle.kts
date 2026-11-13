@@ -20,12 +20,20 @@ java {
     }
 }
 
+// Agente de AspectJ: teje los aspectos de Allure para que @Step y @Attachment generen pasos.
+val aspectjAgent: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    isTransitive = false
+}
+
 dependencies {
     testImplementation(platform(libs.junit.bom))
     testImplementation(platform(libs.allure.bom))
 
     testImplementation(libs.selenium.java)
     testImplementation(libs.junit.jupiter)
+    // API del launcher: AllureRunListener escribe entorno, ejecutor y categorías.
+    testImplementation(libs.junit.platform.launcher)
     testImplementation(libs.assertj.core)
     testImplementation(libs.allure.jupiter)
     testImplementation(libs.jackson.databind)
@@ -34,11 +42,12 @@ dependencies {
     testImplementation(libs.slf4j.api)
     testImplementation(libs.jspecify)
 
-    testRuntimeOnly(libs.junit.platform.launcher)
     testRuntimeOnly(libs.logback.classic)
 
     errorprone(libs.errorprone.core)
     errorprone(libs.nullaway)
+
+    aspectjAgent(libs.aspectjweaver)
 }
 
 // ---------------------------------------------------------------------------
@@ -74,6 +83,13 @@ spotless {
 // ---------------------------------------------------------------------------
 val isCi = providers.environmentVariable("CI").map { it.isNotBlank() && it != "false" }.getOrElse(false)
 val allureResultsDir = layout.buildDirectory.dir("allure-results")
+val allureReportDir = layout.buildDirectory.dir("reports/allure-report/allureReport")
+val allureHistoryDir = allureReportDir.map { it.dir("history") }
+
+/** Pasa el agente de AspectJ a la JVM de las pruebas sin romper la caché de configuración. */
+class AspectjAgent(@get:Classpath val agent: FileCollection) : CommandLineArgumentProvider {
+    override fun asArguments() = listOf("-javaagent:${agent.singleFile.absolutePath}")
+}
 
 tasks.test {
     useJUnitPlatform {
@@ -95,8 +111,19 @@ tasks.test {
     systemProperty("junit.jupiter.execution.parallel.config.fixed.parallelism", parallelism)
     systemProperty("junit.jupiter.execution.parallel.config.fixed.max-pool-size", parallelism)
 
+    jvmArgumentProviders.add(AspectjAgent(aspectjAgent))
+
     systemProperty("allure.results.directory", allureResultsDir.get().asFile.absolutePath)
-    doFirst { allureResultsDir.get().asFile.deleteRecursively() }
+    // Resultados limpios en cada ejecución, conservando el historial del reporte anterior para
+    // que Allure dibuje la tendencia entre ejecuciones.
+    val resultsDir = allureResultsDir.get().asFile
+    val previousHistory = allureHistoryDir.get().asFile
+    doFirst {
+        resultsDir.deleteRecursively()
+        if (previousHistory.isDirectory) {
+            previousHistory.copyRecursively(resultsDir.resolve("history"), overwrite = true)
+        }
+    }
 
     // Reintentos solo en CI.
     retry {

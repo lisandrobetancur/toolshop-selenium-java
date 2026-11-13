@@ -1,6 +1,7 @@
 package com.toolshop.pages;
 
 import com.toolshop.support.Money;
+import io.qameta.allure.Step;
 import java.math.BigDecimal;
 import java.util.List;
 import org.openqa.selenium.By;
@@ -27,6 +28,7 @@ public final class ProductPage extends BasePage {
     super(driver);
   }
 
+  @Step("Abrir el detalle del producto {productId}")
   public ProductPage open(String productId) {
     navigateTo("/product/" + productId);
     waits.visible(NAME);
@@ -53,6 +55,7 @@ public final class ProductPage extends BasePage {
     return Integer.parseInt(valueOf(QUANTITY));
   }
 
+  @Step("Aumentar la cantidad {times} vez/veces")
   public ProductPage increaseQuantity(int times) {
     for (int i = 0; i < times; i++) {
       click(INCREASE);
@@ -60,6 +63,7 @@ public final class ProductPage extends BasePage {
     return this;
   }
 
+  @Step("Disminuir la cantidad {times} vez/veces")
   public ProductPage decreaseQuantity(int times) {
     for (int i = 0; i < times; i++) {
       click(DECREASE);
@@ -68,16 +72,19 @@ public final class ProductPage extends BasePage {
   }
 
   /** Escribe la cantidad directamente en el campo, reemplazando la actual. */
+  @Step("Escribir la cantidad {quantity}")
   public ProductPage setQuantity(int quantity) {
     overwrite(QUANTITY, String.valueOf(quantity));
     return this;
   }
 
+  @Step("Agregar al carrito")
   public ProductPage addToCart() {
     click(ADD_TO_CART);
     return this;
   }
 
+  @Step("Agregar a favoritos")
   public ProductPage addToFavorites() {
     click(ADD_TO_FAVORITES);
     return this;
@@ -98,6 +105,7 @@ public final class ProductPage extends BasePage {
   }
 
   /** Abre el detalle de un producto relacionado y espera a que se muestre. */
+  @Step("Abrir el producto relacionado \"{productName}\"")
   public ProductPage openRelated(String productName) {
     click(By.cssSelector("a[href^='/product/'] img[alt='" + productName + "']"));
     waits.until(

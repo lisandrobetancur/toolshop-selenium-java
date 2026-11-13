@@ -1,5 +1,8 @@
 package com.toolshop.pages;
 
+import io.qameta.allure.Param;
+import io.qameta.allure.Step;
+import io.qameta.allure.model.Parameter;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -17,6 +20,7 @@ public final class LoginPage extends BasePage {
     super(driver);
   }
 
+  @Step("Abrir la página de login")
   public LoginPage open() {
     navigateTo("/auth/login");
     waits.visible(SUBMIT);
@@ -24,7 +28,9 @@ public final class LoginPage extends BasePage {
   }
 
   /** Envía el formulario con las credenciales dadas; un valor vacío deja el campo sin llenar. */
-  public LoginPage submit(String email, String password) {
+  @Step("Iniciar sesión con \"{email}\"")
+  public LoginPage submit(
+      String email, @Param(name = "password", mode = Parameter.Mode.MASKED) String password) {
     waits.visible(SUBMIT);
     if (!email.isEmpty()) {
       type(EMAIL, email);

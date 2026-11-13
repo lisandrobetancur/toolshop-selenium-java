@@ -1,6 +1,7 @@
 package com.toolshop.pages;
 
 import com.toolshop.components.CartTable;
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -20,6 +21,7 @@ public final class CartPage extends BasePage {
   }
 
   /** Abre el carrito y espera a que muestre sus líneas o el aviso de carrito vacío. */
+  @Step("Abrir el carrito")
   public CartPage open() {
     navigateTo("/checkout");
     waits.until(
@@ -36,6 +38,7 @@ public final class CartPage extends BasePage {
     return isDisplayed(EMPTY_MESSAGE);
   }
 
+  @Step("Continuar al checkout")
   public void proceedToCheckout() {
     click(PROCEED);
   }

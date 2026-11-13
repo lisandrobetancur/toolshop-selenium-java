@@ -1,6 +1,7 @@
 package com.toolshop.pages;
 
 import com.toolshop.components.DataTable;
+import io.qameta.allure.Step;
 import java.util.List;
 import java.util.Map;
 import org.openqa.selenium.By;
@@ -18,6 +19,7 @@ public final class InvoicesPage extends BasePage {
     this.table = new DataTable(driver, TABLE);
   }
 
+  @Step("Abrir las facturas del cliente")
   public InvoicesPage open() {
     navigateTo("/account/invoices");
     return this;
@@ -27,6 +29,7 @@ public final class InvoicesPage extends BasePage {
     return table.rows();
   }
 
+  @Step("Abrir el detalle de la factura {invoiceNumber}")
   public InvoiceDetailPage openDetails(String invoiceNumber) {
     table.clickInRow(invoiceNumber, "Details");
     return new InvoiceDetailPage(driver);

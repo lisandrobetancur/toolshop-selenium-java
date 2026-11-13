@@ -1,6 +1,7 @@
 package com.toolshop.components;
 
 import com.toolshop.pages.BasePage;
+import io.qameta.allure.Step;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,6 +44,7 @@ public final class DataTable extends BasePage {
   }
 
   /** Hace clic en el enlace o botón con ese texto, dentro de la fila que contiene el valor. */
+  @Step("Abrir \"{linkText}\" en la fila \"{rowValue}\"")
   public void clickInRow(String rowValue, String linkText) {
     waits.until(
         "poder hacer clic en '" + linkText + "' de la fila '" + rowValue + "'",

@@ -1,5 +1,6 @@
 package com.toolshop.pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -12,6 +13,7 @@ public final class AccountPage extends BasePage {
     super(driver);
   }
 
+  @Step("Abrir la cuenta del cliente")
   public AccountPage open() {
     navigateTo("/account");
     return this;

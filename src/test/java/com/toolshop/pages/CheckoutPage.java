@@ -2,6 +2,7 @@ package com.toolshop.pages;
 
 import com.toolshop.data.Address;
 import com.toolshop.data.Payment;
+import io.qameta.allure.Step;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,6 +50,7 @@ public final class CheckoutPage extends BasePage {
         });
   }
 
+  @Step("Continuar como cliente autenticado")
   public CheckoutPage proceedAsSignedInCustomer() {
     click(PROCEED_SIGNED_IN);
     return this;
@@ -68,6 +70,7 @@ public final class CheckoutPage extends BasePage {
         valueOf(POSTAL_CODE));
   }
 
+  @Step("Confirmar la dirección de facturación")
   public CheckoutPage proceedFromAddress() {
     click(PROCEED_ADDRESS);
     waits.visible(PAYMENT_METHOD);
@@ -75,6 +78,7 @@ public final class CheckoutPage extends BasePage {
   }
 
   /** Elige el medio de pago y completa sus campos. */
+  @Step("Elegir medio de pago: {payment}")
   public CheckoutPage choosePayment(Payment payment) {
     selectByValue(PAYMENT_METHOD, payment.method());
     for (Map.Entry<String, String> field : payment.details().entrySet()) {
@@ -93,12 +97,14 @@ public final class CheckoutPage extends BasePage {
    * Primer clic: la aplicación valida el pago y muestra el resultado. Devuelve el mensaje de
    * validación exitosa.
    */
+  @Step("Validar el pago")
   public String checkPayment() {
     click(FINISH);
     return textOf(PAYMENT_SUCCESS);
   }
 
   /** Segundo clic: confirma el pedido y devuelve el número de factura de la confirmación. */
+  @Step("Confirmar el pedido")
   public String confirmOrder() {
     waits.until(
         "que el botón cambie a 'Confirm'",

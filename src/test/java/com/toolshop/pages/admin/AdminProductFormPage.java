@@ -2,6 +2,7 @@ package com.toolshop.pages.admin;
 
 import com.toolshop.data.NewProduct;
 import com.toolshop.pages.BasePage;
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -19,6 +20,7 @@ public final class AdminProductFormPage extends BasePage {
     super(driver);
   }
 
+  @Step("Abrir el alta de producto")
   public AdminProductFormPage openNew() {
     navigateTo("/admin/products/add");
     waits.visible(SAVE);
@@ -26,6 +28,7 @@ public final class AdminProductFormPage extends BasePage {
   }
 
   /** Abre la edición y espera a que el formulario cargue el producto. */
+  @Step("Abrir la edición del producto {productId}")
   public AdminProductFormPage openExisting(String productId) {
     navigateTo("/admin/products/edit/" + productId);
     waits.until(
@@ -39,6 +42,7 @@ public final class AdminProductFormPage extends BasePage {
    * stock ni los identificadores de marca, categoría e imagen, así que el formulario los carga
    * vacíos y no deja guardar sin volver a indicarlos.
    */
+  @Step("Completar el producto \"{product.name}\" a {product.price}")
   public AdminProductFormPage fill(NewProduct product) {
     type(NAME, product.name());
     type(DESCRIPTION, product.description());
@@ -51,6 +55,7 @@ public final class AdminProductFormPage extends BasePage {
   }
 
   /** Guarda y devuelve el mensaje de confirmación. */
+  @Step("Guardar el producto")
   public String save() {
     click(SAVE);
     return textOf(SAVED);

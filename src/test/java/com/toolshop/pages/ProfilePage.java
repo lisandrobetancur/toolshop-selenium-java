@@ -1,5 +1,6 @@
 package com.toolshop.pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -19,6 +20,7 @@ public final class ProfilePage extends BasePage {
   }
 
   /** Abre el perfil y espera a que el formulario cargue los datos del cliente. */
+  @Step("Abrir el perfil")
   public ProfilePage open() {
     navigateTo("/account/profile");
     waits.until(
@@ -39,17 +41,20 @@ public final class ProfilePage extends BasePage {
     return valueOf(PHONE);
   }
 
+  @Step("Cambiar el nombre a {firstName} {lastName}")
   public ProfilePage changeName(String firstName, String lastName) {
     type(FIRST_NAME, firstName);
     type(LAST_NAME, lastName);
     return this;
   }
 
+  @Step("Cambiar el teléfono a {phone}")
   public ProfilePage changePhone(String phone) {
     type(PHONE, phone);
     return this;
   }
 
+  @Step("Guardar el perfil")
   public ProfilePage save() {
     click(SUBMIT);
     return this;

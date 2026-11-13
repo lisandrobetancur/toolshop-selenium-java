@@ -1,5 +1,6 @@
 package com.toolshop.pages;
 
+import io.qameta.allure.Step;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -19,6 +20,7 @@ public final class FavoritesPage extends BasePage {
     super(driver);
   }
 
+  @Step("Abrir favoritos")
   public FavoritesPage open() {
     navigateTo("/account/favorites");
     waits.visible(TITLE);
@@ -32,6 +34,7 @@ public final class FavoritesPage extends BasePage {
         .toList();
   }
 
+  @Step("Quitar \"{productName}\" de favoritos")
   public void remove(String productName) {
     waits.until(
         "poder quitar '" + productName + "' de favoritos",
