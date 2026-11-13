@@ -11,6 +11,7 @@ import com.toolshop.data.Payment;
 import com.toolshop.data.User;
 import com.toolshop.pages.admin.AdminOrderPage;
 import com.toolshop.session.Session;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -28,6 +29,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 @DisplayName("F12 Administrador: estado de pedidos")
 class F12AdminOrderStatusTest extends UiTest {
 
+  private static final List<String> STATUS_ORDER =
+      List.of("AWAITING_FULFILLMENT", "ON_HOLD", "AWAITING_SHIPMENT", "SHIPPED", "COMPLETED");
+
   @ParameterizedTest(name = "a {0}")
   @Tag("smoke")
   @ValueSource(strings = {"ON_HOLD", "COMPLETED"})
@@ -37,7 +41,8 @@ class F12AdminOrderStatusTest extends UiTest {
     Session.authenticate(driver(), UsersApi.loginAsAdmin());
     AdminOrderPage page = new AdminOrderPage(driver()).open(order.invoice().id());
     assertThat(page.invoiceNumber()).isEqualTo(order.invoice().number());
-    assertThat(page.currentStatus()).isEqualTo("AWAITING_FULFILLMENT");
+    assertThat(page.currentStatus())
+        .isIn(CheckoutAssertions.initialStatuses(order.invoice().paymentMethod()));
 
     page.chooseStatus(newStatus).submitStatus();
 
@@ -55,14 +60,17 @@ class F12AdminOrderStatusTest extends UiTest {
     Session.authenticate(driver(), UsersApi.loginAsAdmin());
     AdminOrderPage page = new AdminOrderPage(driver()).open(order.invoice().id());
 
-    assertThat(page.availableStatuses())
-        .containsExactly("ON_HOLD", "AWAITING_SHIPMENT", "SHIPPED", "COMPLETED");
+    String current = page.currentStatus();
+    List<String> forward =
+        STATUS_ORDER.subList(STATUS_ORDER.indexOf(current) + 1, STATUS_ORDER.size());
+
+    assertThat(page.availableStatuses()).containsExactlyElementsOf(forward);
 
     page.submitStatus();
 
     assertThat(page.errorMessage()).isEqualTo("No new status selected.");
     assertThat(InvoicesApi.get(order.customerToken(), order.invoice().id()).status())
-        .isEqualTo("AWAITING_FULFILLMENT");
+        .isEqualTo(current);
   }
 
   /** Pedido recién creado por un cliente nuevo, preparado por API. */

@@ -19,7 +19,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Los productos creados quedan en el entorno compartido hasta el reinicio horario de la base de
- * datos; el nombre único por ejecución evita colisiones entre pruebas paralelas.
+ * datos. Para no alterar las pruebas de catálogo (F03) que corren en paralelo, cuestan más de 100
+ * (la portada filtra precios entre 1 y 100) y sus nombres no contienen términos que F03 busca.
  */
 @Tag("F11")
 @DisplayName("F11 Administrador: productos")
@@ -32,9 +33,9 @@ class F11AdminProductTest extends UiTest {
     Map.Entry<String, String> brand = ProductsApi.brands().entrySet().iterator().next();
     NewProduct product =
         new NewProduct(
-            NewProduct.uniqueName("Selenium Hammer"),
+            NewProduct.uniqueName("Selenium Gadget"),
             "Product created by the Selenium E2E suite.",
-            Money.of("42.50"),
+            Money.of("142.50"),
             12,
             ProductsApi.categoryId("Hammer"),
             brand.getValue(),
@@ -71,32 +72,32 @@ class F11AdminProductTest extends UiTest {
     String adminToken = UsersApi.loginAsAdmin();
     NewProduct data =
         new NewProduct(
-            NewProduct.uniqueName("Selenium Pliers"),
+            NewProduct.uniqueName("Selenium Widget"),
             "Product created by the Selenium E2E suite.",
-            Money.of("19.99"),
+            Money.of("119.99"),
             5,
             ProductsApi.categoryId("Pliers"),
             ProductsApi.brands().values().iterator().next(),
             ProductsApi.imageId("Combination pliers"));
     Product original = ProductsApi.create(adminToken, data);
-    String newName = NewProduct.uniqueName("Selenium Pliers Edited");
+    String newName = NewProduct.uniqueName("Selenium Widget Edited");
     Session.authenticate(driver(), adminToken);
 
     String saved =
         new AdminProductFormPage(driver())
             .openExisting(original.id())
-            .fill(data.withName(newName).withPrice(Money.of("24.75")))
+            .fill(data.withName(newName).withPrice(Money.of("124.75")))
             .save();
 
     assertThat(saved).isEqualTo("Product saved!");
     Product updated = ProductsApi.get(original.id());
     assertThat(updated.name()).isEqualTo(newName);
-    assertThat(updated.price()).isEqualByComparingTo("24.75");
+    assertThat(updated.price()).isEqualByComparingTo("124.75");
 
     CatalogPage catalog = new CatalogPage(driver()).open().searchFor(newName);
 
     eventually(() -> assertThat(catalog.productNames()).containsExactly(newName));
-    assertThat(catalog.productPrices()).containsExactly(Money.of("24.75"));
+    assertThat(catalog.productPrices()).containsExactly(Money.of("124.75"));
     assertThat(ProductsApi.search(original.name()).products())
         .as("el nombre anterior ya no aparece")
         .isEmpty();

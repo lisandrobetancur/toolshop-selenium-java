@@ -7,6 +7,7 @@ import com.toolshop.data.Invoice;
 import com.toolshop.data.Product;
 import com.toolshop.support.Money;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
 
@@ -14,6 +15,17 @@ import org.assertj.core.api.SoftAssertions;
 final class CheckoutAssertions {
 
   private CheckoutAssertions() {}
+
+  /**
+   * Un pedido nace en AWAITING_FULFILLMENT, pero la tarea {@code order:update} de la aplicación
+   * corre cada 10 minutos y lo mueve a ON_HOLD (transferencia bancaria) o a AWAITING_SHIPMENT
+   * (resto). Si la prueba coincide con esa ejecución, el estado ya avanzó: ambos son correctos.
+   */
+  static List<String> initialStatuses(String paymentMethod) {
+    return List.of(
+        "AWAITING_FULFILLMENT",
+        "bank-transfer".equals(paymentMethod) ? "ON_HOLD" : "AWAITING_SHIPMENT");
+  }
 
   static void assertOrderMatches(
       Invoice invoice, Map<Product, Integer> contents, Address billing, String paymentMethod) {
@@ -23,7 +35,9 @@ final class CheckoutAssertions {
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     SoftAssertions.assertSoftly(soft -> {
       soft.assertThat(invoice.total()).as("total").isEqualByComparingTo(expectedTotal);
-      soft.assertThat(invoice.status()).as("estado inicial").isEqualTo("AWAITING_FULFILLMENT");
+      soft.assertThat(invoice.status())
+          .as("estado inicial (o el que asigna la tarea programada)")
+          .isIn(initialStatuses(paymentMethod));
       soft.assertThat(invoice.paymentMethod()).as("medio de pago").isEqualTo(paymentMethod);
       soft.assertThat(invoice.billingAddress())
           .as("dirección de facturación")

@@ -150,7 +150,6 @@ class F03CatalogTest extends UiTest {
     ProductPageResult first = ProductsApi.storefront(1, Map.of());
     ProductPageResult second = ProductsApi.storefront(2, Map.of());
     ProductPageResult third = ProductsApi.storefront(3, Map.of());
-    ProductPageResult last = ProductsApi.storefront(first.lastPage(), Map.of());
     assertThat(first.lastPage()).as("el catálogo debe tener varias páginas").isGreaterThan(3);
     assertThat(second.names()).doesNotContainAnyElementsOf(first.names());
     CatalogPage catalog = new CatalogPage(driver()).open();
@@ -165,7 +164,14 @@ class F03CatalogTest extends UiTest {
     catalog.pagination().previous();
     eventually(() -> assertThat(catalog.productNames()).containsExactlyElementsOf(second.names()));
 
+    // La última página es donde aparecen los productos que otros usuarios crean en el entorno
+    // compartido: se verifica que sea distinta de las anteriores, no su contenido exacto.
     catalog.pagination().goTo(first.lastPage());
-    eventually(() -> assertThat(catalog.productNames()).containsExactlyElementsOf(last.names()));
+    eventually(() ->
+        assertThat(catalog.productNames())
+            .isNotEmpty()
+            .doesNotContainAnyElementsOf(first.names())
+            .doesNotContainAnyElementsOf(second.names())
+            .doesNotContainAnyElementsOf(third.names()));
   }
 }
