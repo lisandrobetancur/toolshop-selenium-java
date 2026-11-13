@@ -20,7 +20,12 @@ import tools.jackson.databind.json.JsonMapper;
 public final class ApiClient {
 
   private static final HttpClient HTTP =
-      HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(15)).build();
+      HttpClient.newBuilder()
+          .version(HttpClient.Version.HTTP_1_1)
+          .connectTimeout(Duration.ofSeconds(15))
+          .build();
+  // Reintentos inmediatos ante cortes de conexión, solo para lecturas (GET es idempotente).
+  private static final int GET_ATTEMPTS = 3;
   private static final JsonMapper JSON = JsonMapper.builder().build();
   private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(30);
 
@@ -87,13 +92,18 @@ public final class ApiClient {
     if (token != null) {
       request.header("Authorization", "Bearer " + token);
     }
-    try {
-      return HTTP.send(request.build(), BodyHandlers.ofString());
-    } catch (IOException e) {
-      throw new ApiException(method + " " + path + " falló: " + e.getMessage(), e);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new ApiException(method + " " + path + " fue interrumpida", e);
+    int attempts = "GET".equals(method) ? GET_ATTEMPTS : 1;
+    for (int attempt = 1; ; attempt++) {
+      try {
+        return HTTP.send(request.build(), BodyHandlers.ofString());
+      } catch (IOException e) {
+        if (attempt >= attempts) {
+          throw new ApiException(method + " " + path + " falló: " + e.getMessage(), e);
+        }
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new ApiException(method + " " + path + " fue interrumpida", e);
+      }
     }
   }
 }

@@ -23,7 +23,7 @@ public abstract class BasePage {
     return By.cssSelector("[data-test='" + id + "']");
   }
 
-  protected void open(String path) {
+  protected void navigateTo(String path) {
     driver.get(Config.get().baseUrl() + path);
   }
 

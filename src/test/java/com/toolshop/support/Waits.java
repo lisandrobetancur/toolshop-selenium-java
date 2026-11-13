@@ -2,11 +2,13 @@ package com.toolshop.support;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -78,6 +80,32 @@ public final class Waits {
             return false;
           }
         });
+  }
+
+  /**
+   * Repite la aserción hasta que pase o se agote el tiempo; si no pasa, relanza el último error de
+   * aserción para conservar el detalle de "esperado vs. actual". Sirve para verificar resultados
+   * que la aplicación actualiza de forma asíncrona.
+   */
+  public void untilAsserted(Runnable assertion) {
+    AtomicReference<@Nullable AssertionError> lastFailure = new AtomicReference<>();
+    try {
+      until(d -> {
+        try {
+          assertion.run();
+          return true;
+        } catch (AssertionError e) {
+          lastFailure.set(e);
+          return false;
+        }
+      });
+    } catch (TimeoutException e) {
+      AssertionError failure = lastFailure.get();
+      if (failure != null) {
+        throw failure;
+      }
+      throw e;
+    }
   }
 
   private WebDriverWait newWait() {

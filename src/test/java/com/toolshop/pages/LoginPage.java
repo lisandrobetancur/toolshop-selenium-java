@@ -18,7 +18,7 @@ public final class LoginPage extends BasePage {
   }
 
   public LoginPage open() {
-    open("/auth/login");
+    navigateTo("/auth/login");
     waits.visible(SUBMIT);
     return this;
   }

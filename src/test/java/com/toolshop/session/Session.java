@@ -41,6 +41,12 @@ public final class Session {
     return token == null ? null : token.toString();
   }
 
+  /** Identificador del carrito que la aplicación asoció a esta pestaña, o null si no hay. */
+  public static @Nullable String cartId(WebDriver driver) {
+    Object id = js(driver).executeScript("return window.sessionStorage.getItem('cart_id');");
+    return id == null ? null : id.toString();
+  }
+
   /** El almacenamiento web es por origen: hay que estar en la aplicación antes de escribirlo. */
   private static void openOrigin(WebDriver driver) {
     String baseUrl = Config.get().baseUrl();

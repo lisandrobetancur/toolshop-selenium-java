@@ -29,7 +29,7 @@ public final class RegisterPage extends BasePage {
   }
 
   public RegisterPage open() {
-    open("/auth/register");
+    navigateTo("/auth/register");
     waits.visible(SUBMIT);
     return this;
   }

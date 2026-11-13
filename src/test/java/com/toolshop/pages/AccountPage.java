@@ -13,7 +13,7 @@ public final class AccountPage extends BasePage {
   }
 
   public AccountPage open() {
-    open("/account");
+    navigateTo("/account");
     return this;
   }
 
