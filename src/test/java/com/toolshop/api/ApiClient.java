@@ -19,11 +19,10 @@ import tools.jackson.databind.json.JsonMapper;
  */
 public final class ApiClient {
 
+  // HTTP/2 (por defecto): por HTTP/1.1 el servidor responde "Connection: Upgrade, close" y el
+  // cliente del JDK intenta reutilizar una conexión que el servidor ya cerró.
   private static final HttpClient HTTP =
-      HttpClient.newBuilder()
-          .version(HttpClient.Version.HTTP_1_1)
-          .connectTimeout(Duration.ofSeconds(15))
-          .build();
+      HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(15)).build();
   // Reintentos inmediatos ante cortes de conexión, solo para lecturas (GET es idempotente).
   private static final int GET_ATTEMPTS = 3;
   private static final JsonMapper JSON = JsonMapper.builder().build();
