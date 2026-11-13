@@ -17,6 +17,7 @@ import com.toolshop.pages.InvoicesPage;
 import com.toolshop.pages.ProfilePage;
 import com.toolshop.session.Session;
 import com.toolshop.support.Money;
+import io.qameta.allure.Epic;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
 
+@Epic("Tienda")
 @Tag("F09")
 @DisplayName("F09 Cuenta del cliente")
 class F09AccountTest extends UiTest {

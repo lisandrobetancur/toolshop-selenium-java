@@ -12,6 +12,7 @@ import com.toolshop.data.Product;
 import com.toolshop.pages.CartPage;
 import com.toolshop.session.Session;
 import com.toolshop.support.Money;
+import io.qameta.allure.Epic;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Epic("Tienda")
 @Tag("F05")
 @DisplayName("F05 Carrito")
 class F05CartTest extends UiTest {

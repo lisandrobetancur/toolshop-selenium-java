@@ -8,6 +8,7 @@ import com.toolshop.data.User;
 import com.toolshop.pages.AccountPage;
 import com.toolshop.pages.LoginPage;
 import com.toolshop.session.Session;
+import io.qameta.allure.Epic;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+@Epic("Tienda")
 @Tag("F02")
 @DisplayName("F02 Login")
 class F02LoginTest extends UiTest {
@@ -79,7 +81,7 @@ class F02LoginTest extends UiTest {
     assertThat(Session.storedToken(driver())).isNull();
   }
 
-  @ParameterizedTest(name = "correo=''{0}'' clave=''{1}''")
+  @ParameterizedTest(quoteTextArguments = false, name = "correo=[{0}] clave=[{1}]")
   @Tag("regression")
   @DisplayName("El formulario valida los campos antes de enviar")
   @CsvSource(

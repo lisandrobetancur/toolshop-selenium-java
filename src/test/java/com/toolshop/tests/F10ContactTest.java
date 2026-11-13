@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.toolshop.api.MessagesApi;
 import com.toolshop.api.UsersApi;
 import com.toolshop.pages.ContactPage;
+import io.qameta.allure.Epic;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -22,6 +23,7 @@ import tools.jackson.databind.JsonNode;
  * práctica). El caso feliz usa un archivo vacío; los negativos, uno con contenido y otro de otro
  * tipo.
  */
+@Epic("Tienda")
 @Tag("F10")
 @DisplayName("F10 Formulario de contacto")
 class F10ContactTest extends UiTest {

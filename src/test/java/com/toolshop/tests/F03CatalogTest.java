@@ -6,6 +6,7 @@ import com.toolshop.api.ProductsApi;
 import com.toolshop.data.Product;
 import com.toolshop.data.ProductPageResult;
 import com.toolshop.pages.CatalogPage;
+import io.qameta.allure.Epic;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+@Epic("Tienda")
 @Tag("F03")
 @DisplayName("F03 Catálogo")
 class F03CatalogTest extends UiTest {
@@ -118,7 +120,7 @@ class F03CatalogTest extends UiTest {
         () -> assertThat(catalog.productNames()).containsExactlyElementsOf(expected.names()));
   }
 
-  @ParameterizedTest(name = "orden {0}")
+  @ParameterizedTest(quoteTextArguments = false, name = "orden {0}")
   @Tag("regression")
   @DisplayName("El catálogo se ordena por nombre y por precio, ascendente y descendente")
   @ValueSource(strings = {"name,asc", "name,desc", "price,asc", "price,desc"})

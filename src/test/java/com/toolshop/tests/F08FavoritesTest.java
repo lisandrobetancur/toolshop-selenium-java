@@ -10,11 +10,13 @@ import com.toolshop.data.Product;
 import com.toolshop.pages.FavoritesPage;
 import com.toolshop.pages.ProductPage;
 import com.toolshop.session.Session;
+import io.qameta.allure.Epic;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Epic("Tienda")
 @Tag("F08")
 @DisplayName("F08 Favoritos")
 class F08FavoritesTest extends UiTest {

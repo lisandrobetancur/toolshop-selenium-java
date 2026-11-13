@@ -9,11 +9,13 @@ import com.toolshop.data.Payment;
 import com.toolshop.pages.CartPage;
 import com.toolshop.pages.CheckoutPage;
 import com.toolshop.session.Session;
+import io.qameta.allure.Epic;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Epic("Tienda")
 @Tag("F06")
 @DisplayName("F06 Checkout como cliente autenticado")
 class F06CheckoutTest extends UiTest {

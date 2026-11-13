@@ -12,6 +12,7 @@ import com.toolshop.pages.ProductPage;
 import com.toolshop.pages.admin.AdminProductFormPage;
 import com.toolshop.session.Session;
 import com.toolshop.support.Money;
+import io.qameta.allure.Epic;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test;
  * datos. Para no alterar las pruebas de catálogo (F03) que corren en paralelo, cuestan más de 100
  * (la portada filtra precios entre 1 y 100) y sus nombres no contienen términos que F03 busca.
  */
+@Epic("Administración")
 @Tag("F11")
 @DisplayName("F11 Administrador: productos")
 class F11AdminProductTest extends UiTest {

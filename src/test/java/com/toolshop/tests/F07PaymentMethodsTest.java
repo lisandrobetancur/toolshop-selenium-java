@@ -8,6 +8,7 @@ import com.toolshop.data.Invoice;
 import com.toolshop.data.Payment;
 import com.toolshop.pages.CartPage;
 import com.toolshop.pages.CheckoutPage;
+import io.qameta.allure.Epic;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@Epic("Tienda")
 @Tag("F07")
 @DisplayName("F07 Checkout con distintos medios de pago")
 class F07PaymentMethodsTest extends UiTest {
@@ -30,7 +32,7 @@ class F07PaymentMethodsTest extends UiTest {
         Payment.giftCard());
   }
 
-  @ParameterizedTest(name = "{0}")
+  @ParameterizedTest(quoteTextArguments = false, name = "{0}")
   @MethodSource("paymentMethods")
   @Tag("regression")
   @DisplayName("Cada medio de pago genera un pedido con sus datos de pago")

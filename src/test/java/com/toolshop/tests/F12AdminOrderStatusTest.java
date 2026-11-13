@@ -11,6 +11,7 @@ import com.toolshop.data.Payment;
 import com.toolshop.data.User;
 import com.toolshop.pages.admin.AdminOrderPage;
 import com.toolshop.session.Session;
+import io.qameta.allure.Epic;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +26,7 @@ import org.junit.jupiter.params.provider.ValueSource;
  * GET /invoices/{id}}. Se usan estados finales que la tarea programada de la aplicación (cada 10
  * minutos) no vuelve a mover: ON_HOLD y COMPLETED.
  */
+@Epic("Administración")
 @Tag("F12")
 @DisplayName("F12 Administrador: estado de pedidos")
 class F12AdminOrderStatusTest extends UiTest {
@@ -32,7 +34,7 @@ class F12AdminOrderStatusTest extends UiTest {
   private static final List<String> STATUS_ORDER =
       List.of("AWAITING_FULFILLMENT", "ON_HOLD", "AWAITING_SHIPMENT", "SHIPPED", "COMPLETED");
 
-  @ParameterizedTest(name = "a {0}")
+  @ParameterizedTest(quoteTextArguments = false, name = "a {0}")
   @Tag("smoke")
   @ValueSource(strings = {"ON_HOLD", "COMPLETED"})
   @DisplayName("El administrador cambia el estado y el cliente lo ve en su pedido")

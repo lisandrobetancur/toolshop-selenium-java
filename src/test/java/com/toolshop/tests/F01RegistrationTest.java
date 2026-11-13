@@ -10,12 +10,14 @@ import com.toolshop.data.UserFactory;
 import com.toolshop.pages.AccountPage;
 import com.toolshop.pages.LoginPage;
 import com.toolshop.pages.RegisterPage;
+import io.qameta.allure.Epic;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
 
+@Epic("Tienda")
 @Tag("F01")
 @DisplayName("F01 Registro de cliente")
 class F01RegistrationTest extends UiTest {
