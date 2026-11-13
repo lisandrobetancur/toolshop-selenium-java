@@ -1,5 +1,6 @@
 package com.toolshop.api;
 
+import com.toolshop.data.NewProduct;
 import com.toolshop.data.Product;
 import com.toolshop.data.ProductPageResult;
 import java.math.RoundingMode;
@@ -106,6 +107,33 @@ public final class ProductsApi {
       brands.put(brand.path("name").asString(), brand.path("id").asString());
     }
     return brands;
+  }
+
+  /** Identificador de una imagen del catálogo a partir de su título. */
+  public static String imageId(String title) {
+    for (JsonNode image : ApiClient.anonymous().get("/images")) {
+      if (title.equals(image.path("title").asString())) {
+        return image.path("id").asString();
+      }
+    }
+    throw new IllegalStateException("No existe la imagen '" + title + "'");
+  }
+
+  /** Crea un producto como administrador y lo devuelve tal como lo guardó la API. */
+  public static Product create(String adminToken, NewProduct product) {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put("name", product.name());
+    body.put("description", product.description());
+    body.put("price", product.price());
+    body.put("stock", product.stock());
+    body.put("category_id", product.categoryId());
+    body.put("brand_id", product.brandId());
+    body.put("product_image_id", product.imageId());
+    body.put("is_location_offer", false);
+    body.put("is_rental", false);
+    String id =
+        ApiClient.anonymous().withToken(adminToken).post("/products", body).path("id").asString();
+    return get(id);
   }
 
   private static List<Product> toProducts(JsonNode array) {
