@@ -5,6 +5,7 @@ import com.toolshop.support.Waits;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 /** Base de los Page Objects: navegación, localizadores {@code data-test} y acciones con espera. */
 public abstract class BasePage {
@@ -34,6 +35,10 @@ public abstract class BasePage {
     WebElement field = waits.visible(locator);
     field.clear();
     field.sendKeys(text);
+  }
+
+  protected void selectByValue(By locator, String value) {
+    new Select(waits.visible(locator)).selectByValue(value);
   }
 
   protected String textOf(By locator) {
