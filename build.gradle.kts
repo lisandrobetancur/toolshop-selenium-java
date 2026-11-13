@@ -1,3 +1,4 @@
+import io.qameta.allure.gradle.report.tasks.AllureReport
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
@@ -120,7 +121,12 @@ allure {
     }
 }
 
-tasks.named("allureReport") {
+tasks.named<AllureReport>("allureReport") {
+    // El plugin allure-report por sí solo no conoce los resultados (en el plugin completo los
+    // aporta el adaptador): se conecta el directorio que escribe allure-jupiter.
+    resultsDirs.from(allureResultsDir)
+    // Reporte limpio en cada generación, sin restos de ejecuciones anteriores.
+    clean = true
     // El reporte se genera siempre, también cuando hay pruebas fallidas.
     mustRunAfter(tasks.test)
 }
