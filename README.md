@@ -95,6 +95,7 @@ Plugin Portal y GitHub Releases el **2026-11-12**. Están fijadas en
 | SLF4J / Logback | 2.0.20 / 1.6.6 | |
 | Spotless + google-java-format | 8.11.0 / 2.0.0 | Formateador |
 | Error Prone / NullAway / JSpecify | 2.52.0 / 0.14.3 / 1.0.1 | Linter y nulabilidad estricta, con `-Werror` |
+| AspectJ Weaver | 1.9.27 | Agente de la JVM para los `@Step` de Allure (soporta Java 25) |
 | Plugin `org.gradle.test-retry` | 1.6.6 | Reintentos, solo en CI |
 | Plugin foojay-resolver | 1.0.0 | Descarga del JDK del toolchain |
 | GitHub Actions | checkout 7.0.1, setup-java 6.2.0, gradle/actions 6.4.1, upload-artifact 7.0.2 | |
@@ -113,6 +114,7 @@ src/test/java/com/toolshop/
   driver/      DriverFactory (local | RemoteWebDriver), DriverExtension (JUnit 5 + ThreadLocal)
   evidence/    FailureEvidence: captura, HTML, URL y logs del navegador → Allure
   support/     Waits (solo WebDriverWait), Money
+  report/      Etiquetas de Allure, entorno, ejecutor y categorías de fallos
   api/         ApiClient y servicios: Users, Products, Carts, Invoices, Favorites, Messages, Addresses
   data/        Records del dominio y UserFactory
   session/     Session: inyecta JWT y carrito en el almacenamiento del navegador
@@ -147,6 +149,16 @@ src/test/java/com/toolshop/
   fallida se adjuntan al reporte la captura, el HTML, la URL y los logs de
   consola (los logs solo en Chromium; los demás navegadores no los exponen por
   WebDriver).
+- **Reporte legible.** Cada acción de negocio es un paso (`@Step`, tejido por
+  el agente de AspectJ) y cada llamada a la API aparece como
+  `API METODO /ruta`, así un fallo muestra en qué punto del flujo ocurrió. Las
+  contraseñas se enmascaran. Behaviors agrupa por epic (Tienda,
+  Administración) y flujo. Las pruebas `smoke` tienen severidad `critical`. El
+  reporte incluye entorno (versión real del navegador, URLs, versiones),
+  ejecutor (local o GitHub Actions con enlace a la ejecución), categorías de
+  fallo (defecto de negocio, API, espera vencida, navegador que no arranca) y
+  tendencia entre ejecuciones (el historial se conserva en local y se cachea
+  en CI).
 - **Datos independientes.** Cada prueba registra su propio cliente único
   (correo aleatorio y dirección válida obtenida de `/postcode-lookup`). Crea por
   API el carrito, el pedido o el favorito que necesite. Ninguna prueba depende de
