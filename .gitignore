@@ -1,0 +1,17 @@
+.gradle/
+build/
+out/
+bin/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Configuración local con credenciales
+.env
+
+# Resultados de Allure fuera de build/
+allure-results/
+allure-report/
+
+.claude/
