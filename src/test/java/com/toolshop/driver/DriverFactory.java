@@ -1,5 +1,6 @@
 package com.toolshop.driver;
 
+import com.toolshop.config.Browser;
 import com.toolshop.config.Config;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -34,7 +35,8 @@ public final class DriverFactory {
 
   public static WebDriver create(Config config) {
     WebDriver driver = config.gridUrl() != null ? remote(config, config.gridUrl()) : local(config);
-    if (!config.headless()) {
+    // Safari no tiene modo headless: siempre se le fija el tamaño de ventana.
+    if (!config.headless() || config.browser() == Browser.SAFARI) {
       driver.manage().window().setSize(new Dimension(WIDTH, HEIGHT));
     }
     return driver;
