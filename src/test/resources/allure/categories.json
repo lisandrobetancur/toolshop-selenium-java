@@ -1,0 +1,25 @@
+[
+  {
+    "name": "Defecto de negocio (aserción fallida)",
+    "description": "La aplicación respondió, pero el resultado no es el esperado: totales, estados, mensajes o datos.",
+    "matchedStatuses": ["failed"]
+  },
+  {
+    "name": "API no disponible o con error",
+    "description": "Falló una llamada de preparación o verificación contra la API (corte de red, 4xx o 5xx).",
+    "matchedStatuses": ["broken"],
+    "traceRegex": "(?s).*com\\.toolshop\\.api\\.ApiException.*"
+  },
+  {
+    "name": "Elemento o condición no alcanzada a tiempo",
+    "description": "Una espera explícita venció: la UI no llegó al estado esperado dentro de TIMEOUT_SECONDS.",
+    "matchedStatuses": ["broken"],
+    "traceRegex": "(?s).*org\\.openqa\\.selenium\\.TimeoutException.*"
+  },
+  {
+    "name": "No se pudo iniciar el navegador",
+    "description": "El driver o el navegador no arrancó (versión, permisos o Grid no disponible).",
+    "matchedStatuses": ["broken"],
+    "traceRegex": "(?s).*SessionNotCreatedException.*"
+  }
+]
