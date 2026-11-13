@@ -5,6 +5,7 @@ import com.toolshop.config.Config;
 import com.toolshop.report.RunInfo;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.time.Duration;
 import java.util.Map;
 import java.util.logging.Level;
 import org.openqa.selenium.Capabilities;
@@ -32,12 +33,17 @@ public final class DriverFactory {
 
   private static final int WIDTH = 1440;
   private static final int HEIGHT = 1080;
+  private static final Duration PAGE_LOAD_TIMEOUT = Duration.ofSeconds(60);
 
   private DriverFactory() {}
 
   public static WebDriver create(Config config) {
     WebDriver driver = config.gridUrl() != null ? remote(config, config.gridUrl()) : local(config);
     RunInfo.recordBrowser(((HasCapabilities) driver).getCapabilities());
+    // Por defecto WebDriver espera hasta 300 s una carga de página y el cliente HTTP corta a los
+    // 180 s: un navegador colgado bloqueaba la prueba (y su evidencia) unos 7 minutos. Con 60 s el
+    // fallo es rápido y claro, y en CI lo cubre el reintento.
+    driver.manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT);
     // Safari no tiene modo headless: siempre se le fija el tamaño de ventana.
     if (!config.headless() || config.browser() == Browser.SAFARI) {
       driver.manage().window().setSize(new Dimension(WIDTH, HEIGHT));

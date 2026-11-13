@@ -17,7 +17,9 @@ public final class Pagination extends BasePage {
 
   @Step("Ir a la página {page}")
   public void goTo(int page) {
-    click(By.cssSelector("button[aria-label='Page-" + page + "']"));
+    // Sin atar la etiqueta: el sitio público usa <button> y la imagen Docker 2.5, <a
+    // role="button">.
+    click(By.cssSelector("app-pagination [aria-label='Page-" + page + "']"));
   }
 
   @Step("Ir a la página siguiente")
