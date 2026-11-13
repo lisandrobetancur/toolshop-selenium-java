@@ -3,6 +3,9 @@ package com.toolshop.pages;
 import com.toolshop.config.Config;
 import com.toolshop.support.Waits;
 import org.openqa.selenium.By;
+import org.openqa.selenium.HasCapabilities;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -35,6 +38,16 @@ public abstract class BasePage {
     WebElement field = waits.visible(locator);
     field.clear();
     field.sendKeys(text);
+  }
+
+  /**
+   * Reemplaza el contenido de un campo seleccionándolo todo y escribiendo encima, como haría una
+   * persona. Evita el estado intermedio "campo vacío", que algunos campos numéricos corrigen solos.
+   */
+  protected void overwrite(By locator, CharSequence text) {
+    Platform platform = ((HasCapabilities) driver).getCapabilities().getPlatformName();
+    Keys modifier = platform != null && platform.is(Platform.MAC) ? Keys.COMMAND : Keys.CONTROL;
+    waits.visible(locator).sendKeys(Keys.chord(modifier, "a"), text);
   }
 
   protected void selectByValue(By locator, String value) {
