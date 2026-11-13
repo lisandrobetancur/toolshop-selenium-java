@@ -65,6 +65,15 @@ jobs:
           java-version: "25"
       # Caché de dependencias y del wrapper de Gradle.
       - uses: gradle/actions/setup-gradle@v6.4.1
+      # Historial de Allure entre ejecuciones (pestaña Trend y reintentos previos).
+      - name: Restaurar historial de Allure
+        uses: actions/cache@v6.1.0
+        with:
+          path: build/reports/allure-report/allureReport/history
+          key: allure-history-${{ matrix.browser }}-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            allure-history-${{ matrix.browser }}-${{ github.ref_name }}-
+            allure-history-${{ matrix.browser }}-
       # Los navegadores vienen en la imagen de Ubuntu; Selenium Manager resuelve los drivers.
       - name: Ejecutar pruebas
         run: |
@@ -109,6 +118,15 @@ jobs:
           distribution: temurin
           java-version: "25"
       - uses: gradle/actions/setup-gradle@v6.4.1
+      # Historial de Allure entre ejecuciones (pestaña Trend y reintentos previos).
+      - name: Restaurar historial de Allure
+        uses: actions/cache@v6.1.0
+        with:
+          path: build/reports/allure-report/allureReport/history
+          key: allure-history-safari-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            allure-history-safari-${{ github.ref_name }}-
+            allure-history-safari-
       - name: Habilitar safaridriver
         run: sudo safaridriver --enable
       - name: Ejecutar pruebas
