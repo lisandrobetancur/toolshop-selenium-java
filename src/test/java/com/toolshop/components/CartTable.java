@@ -6,7 +6,6 @@ import io.qameta.allure.Step;
 import java.math.BigDecimal;
 import java.util.List;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -61,7 +60,7 @@ public final class CartTable extends BasePage {
                     .map(label -> label.getDomAttribute("for"))
                     .findFirst()
                     .orElse(null));
-    overwrite(By.id(inputId), String.valueOf(quantity) + Keys.TAB);
+    overwrite(By.id(inputId), String.valueOf(quantity), true);
   }
 
   @Step("Eliminar \"{product}\" del carrito")

@@ -8,6 +8,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
 /** Base de los Page Objects: navegación, localizadores {@code data-test} y acciones con espera. */
@@ -43,11 +44,28 @@ public abstract class BasePage {
   /**
    * Reemplaza el contenido de un campo seleccionándolo todo y escribiendo encima, como haría una
    * persona. Evita el estado intermedio "campo vacío", que algunos campos numéricos corrigen solos.
+   * Usa Actions con la tecla modificadora presionada y soltada de forma explícita: en Firefox, un
+   * único sendKeys con Keys.chord no dispara el evento input y Angular no ve el cambio.
+   *
+   * @param confirm si se presiona Tab al final para confirmar el campo (evento change)
    */
-  protected void overwrite(By locator, CharSequence text) {
+  protected void overwrite(By locator, String text, boolean confirm) {
     Platform platform = ((HasCapabilities) driver).getCapabilities().getPlatformName();
     Keys modifier = platform != null && platform.is(Platform.MAC) ? Keys.COMMAND : Keys.CONTROL;
-    waits.visible(locator).sendKeys(Keys.chord(modifier, "a"), text);
+    WebElement field = waits.visible(locator);
+    new Actions(driver)
+        .click(field)
+        .keyDown(modifier)
+        .sendKeys("a")
+        .keyUp(modifier)
+        .sendKeys(text)
+        .perform();
+    waits.until(
+        "que el campo " + locator + " contenga '" + text + "'",
+        d -> text.equals(d.findElement(locator).getDomProperty("value")));
+    if (confirm) {
+      field.sendKeys(Keys.TAB);
+    }
   }
 
   protected void selectByValue(By locator, String value) {

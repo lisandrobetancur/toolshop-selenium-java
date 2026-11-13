@@ -91,6 +91,12 @@ public final class DriverFactory {
     if (headless) {
       options.addArguments("--headless=new");
     }
+    // En los runners Ubuntu 24.04 de GitHub, AppArmor restringe los user namespaces que usa el
+    // sandbox de Edge (Chrome trae su propio perfil de AppArmor, Edge no) y el navegador se cierra
+    // al arrancar. Solo en CI, que corre en una máquina efímera, se desactiva ese sandbox.
+    if (isCi()) {
+      options.addArguments("--no-sandbox");
+    }
     options.setExperimentalOption("prefs", Map.of("intl.accept_languages", "en-US,en"));
     options.setCapability("ms:loggingPrefs", browserLogs());
     return options;
@@ -104,6 +110,11 @@ public final class DriverFactory {
     }
     options.addPreference("intl.accept_languages", "en-US,en");
     return options;
+  }
+
+  private static boolean isCi() {
+    String ci = System.getenv("CI");
+    return ci != null && !ci.isBlank() && !"false".equalsIgnoreCase(ci);
   }
 
   private static LoggingPreferences browserLogs() {

@@ -74,7 +74,7 @@ public final class ProductPage extends BasePage {
   /** Escribe la cantidad directamente en el campo, reemplazando la actual. */
   @Step("Escribir la cantidad {quantity}")
   public ProductPage setQuantity(int quantity) {
-    overwrite(QUANTITY, String.valueOf(quantity));
+    overwrite(QUANTITY, String.valueOf(quantity), false);
     return this;
   }
 
