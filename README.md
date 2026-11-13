@@ -55,6 +55,7 @@ No hay credenciales en el código.
 | `HEADLESS` | `true` | Navegador sin ventana (Safari lo ignora) |
 | `GRID_URL` | _(vacío)_ | Si existe, usa `RemoteWebDriver` contra ese Grid |
 | `TIMEOUT_SECONDS` | `15` | Espera explícita máxima por condición |
+| `SCREENSHOT_ON_PASS` | `true` | Captura final (JPEG) en las pruebas que pasan; `false` para reportes más livianos |
 | `PARALLELISM` | `4` | Hilos de JUnit en paralelo |
 | `ADMIN_EMAIL` | `admin@practicesoftwaretesting.com` | Cuenta de administrador (F10–F12) |
 | `ADMIN_PASSWORD` | _(obligatoria)_ | Contraseña del administrador; en CI, secreto `TOOLSHOP_ADMIN_PASSWORD` |
@@ -145,10 +146,12 @@ src/test/java/com/toolshop/
 - **Un WebDriver por prueba.** `DriverExtension` lo crea en `beforeEach`, lo
   guarda en un `ThreadLocal` y lo cierra en `afterEach`. JUnit corre en paralelo
   clases y métodos, con `PARALLELISM` hilos.
-- **Evidencia solo en fallos.** Antes de cerrar el navegador de una prueba
-  fallida se adjuntan al reporte la captura, el HTML, la URL y los logs de
+- **Evidencia en cada prueba.** Antes de cerrar el navegador de una prueba
+  fallida se adjuntan al reporte la captura PNG, el HTML, la URL y los logs de
   consola (los logs solo en Chromium; los demás navegadores no los exponen por
-  WebDriver).
+  WebDriver). Las pruebas que pasan adjuntan una captura final en JPEG
+  comprimido (unos 85 KB): con PNG, el reporte de un solo archivo pasaría de
+  50 MB; así queda en unos 10 MB. Se desactiva con `SCREENSHOT_ON_PASS=false`.
 - **Reporte legible.** Cada acción de negocio es un paso (`@Step`, tejido por
   el agente de AspectJ) y cada llamada a la API aparece como
   `API METODO /ruta`, así un fallo muestra en qué punto del flujo ocurrió. Las

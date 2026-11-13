@@ -112,6 +112,8 @@ tasks.test {
     systemProperty("junit.jupiter.execution.parallel.config.fixed.max-pool-size", parallelism)
 
     jvmArgumentProviders.add(AspectjAgent(aspectjAgent))
+    // La conversión de capturas a JPEG usa java.awt: sin pantalla y sin ícono en el Dock de macOS.
+    systemProperty("java.awt.headless", "true")
 
     systemProperty("allure.results.directory", allureResultsDir.get().asFile.absolutePath)
     // Resultados limpios en cada ejecución, conservando el historial del reporte anterior para

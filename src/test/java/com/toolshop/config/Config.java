@@ -16,6 +16,7 @@ public record Config(
     boolean headless,
     @Nullable URI gridUrl,
     Duration timeout,
+    boolean screenshotOnPass,
     String adminEmail,
     @Nullable String adminPassword) {
 
@@ -44,6 +45,7 @@ public record Config(
         Boolean.parseBoolean(env.get("HEADLESS", "true")),
         grid == null ? null : URI.create(grid),
         Duration.ofSeconds(Long.parseLong(env.get("TIMEOUT_SECONDS", "15"))),
+        Boolean.parseBoolean(env.get("SCREENSHOT_ON_PASS", "true")),
         env.get("ADMIN_EMAIL", "admin@practicesoftwaretesting.com"),
         blankToNull(env.get("ADMIN_PASSWORD")));
   }
