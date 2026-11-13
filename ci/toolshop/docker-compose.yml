@@ -1,0 +1,59 @@
+# Toolshop (sprint 5) local para el CI, con las imágenes oficiales de testsmith.
+# El sitio público está detrás de Cloudflare, que bloquea (403 / "Just a moment...") a los
+# navegadores headless que corren desde los IPs de GitHub Actions. Contra esta instancia el CI no
+# depende de esa verificación y, además, no hay reinicio horario de la base ni otros usuarios.
+#
+# Basado en docker-compose.prod.yml de https://github.com/testsmith-io/practice-software-testing:
+# - sin el contenedor cron (genera PDFs y mueve estados de pedidos cada 10 minutos);
+# - nginx oficial con config propia en lugar de practice-software-testing-web (solo arm64).
+#
+#   docker compose -f ci/toolshop/docker-compose.yml up -d --wait
+#   docker compose -f ci/toolshop/docker-compose.yml exec -T laravel-api \
+#     php artisan migrate:fresh --seed --force
+#
+# UI: http://localhost:4200   API: http://localhost:8091
+# Los puertos son fijos: la UI de desarrollo (ng serve) apunta siempre a localhost:8091.
+name: toolshop-selenium
+
+services:
+  laravel-api:
+    # Solo se publica para linux/amd64.
+    image: testsmith/practice-software-testing-sprint5-api:2.5
+    platform: linux/amd64
+    environment:
+      DB_HOST: mariadb
+      DB_PORT: "3306"
+      DISABLE_LOGGING: "true"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+  angular-ui:
+    # Solo se publica para linux/amd64. Con "ng serve" usa environment.ts: API en localhost:8091.
+    image: testsmith/practice-software-testing-sprint5-ui:2.5
+    platform: linux/amd64
+    command: bash -c "ng serve --host 0.0.0.0 --port 4200"
+    ports:
+      - "4200:4200"
+
+  web:
+    image: nginx:1.30.6-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8091:80"
+    depends_on:
+      - laravel-api
+
+  mariadb:
+    image: yobasystems/alpine-mariadb:10.6.11
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: toolshop
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 3s
+      timeout: 3s
+      retries: 40

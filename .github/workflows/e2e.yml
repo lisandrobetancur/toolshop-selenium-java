@@ -25,6 +25,7 @@ permissions:
 env:
   CI: "true"
   HEADLESS: "true"
+  # Por defecto, el sitio público. Los jobs de Ubuntu lo reemplazan por Toolshop en Docker.
   BASE_URL: https://practicesoftwaretesting.com
   API_URL: https://api.practicesoftwaretesting.com
   ADMIN_EMAIL: admin@practicesoftwaretesting.com
@@ -57,6 +58,10 @@ jobs:
     env:
       BROWSER: ${{ matrix.browser }}
       PARALLELISM: "4"
+      # Toolshop local en Docker: el sitio público está detrás de Cloudflare, que bloquea a los
+      # navegadores headless que corren desde los IPs de GitHub Actions.
+      BASE_URL: http://localhost:4200
+      API_URL: http://localhost:8091
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-java@v6.2.0
@@ -74,6 +79,8 @@ jobs:
           restore-keys: |
             allure-history-${{ matrix.browser }}-${{ github.ref_name }}-
             allure-history-${{ matrix.browser }}-
+      - name: Levantar Toolshop en Docker
+        run: ci/toolshop/start.sh
       # Los navegadores vienen en la imagen de Ubuntu; Selenium Manager resuelve los drivers.
       - name: Ejecutar pruebas
         run: |
@@ -90,6 +97,9 @@ jobs:
           path: build/reports/allure-report/allureReport
           if-no-files-found: warn
           retention-days: 14
+      - name: Logs de Toolshop
+        if: failure()
+        run: docker compose -f ci/toolshop/docker-compose.yml logs --no-color --tail 200
       - name: Publicar resultados crudos
         if: always()
         uses: actions/upload-artifact@v7.0.2
@@ -101,6 +111,8 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  # Los runners macOS no traen Docker: Safari corre contra el sitio público y puede chocar con la
+  # verificación de Cloudflare.
   safari:
     name: E2E (safari, macOS)
     needs: quality

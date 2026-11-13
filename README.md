@@ -184,15 +184,45 @@ src/test/java/com/toolshop/
 
 1. `quality`: Spotless, Error Prone y NullAway.
 2. `e2e`: matriz **chrome / firefox / edge** en `ubuntu-latest`, en paralelo y
-   headless. Usa la caché de Gradle (`gradle/actions/setup-gradle`) y 4 hilos por
-   job. Publica el reporte Allure y los resultados crudos como artefactos aunque
-   haya fallos.
+   headless, **contra Toolshop levantado en Docker dentro del job**
+   ([ci/toolshop](ci/toolshop)). Usa la caché de Gradle
+   (`gradle/actions/setup-gradle`) y 4 hilos por job. Publica el reporte Allure y
+   los resultados crudos como artefactos aunque haya fallos, y los logs de
+   Toolshop si algo falla.
 3. `safari`: opcional, en `macos-latest`, con un solo hilo. Se activa al lanzar
-   el workflow a mano con `safari: true`.
+   el workflow a mano con `safari: true`. Los runners macOS no traen Docker, así
+   que corre contra el sitio público y puede chocar con Cloudflare.
+
+**Por qué Docker en CI.** El sitio público está detrás de Cloudflare, que trata
+como bot al navegador headless que corre desde los IPs de GitHub Actions: en vez
+de Toolshop sirve la página "Just a moment… Performing security verification" y
+la API responde 403. La suite no intenta evadir esa verificación. En su lugar,
+el CI levanta las imágenes oficiales de testsmith (sprint 5, versión 2.5) con
+[ci/toolshop/start.sh](ci/toolshop/start.sh), que inicia los contenedores,
+siembra la base con `migrate:fresh --seed` y espera a la API y a la UI. Respecto
+del `docker-compose.prod.yml` oficial hay dos diferencias: el proxy es nginx
+oficial con una config FastCGI propia (la imagen `practice-software-testing-web`
+solo existe para arm64) y no hay contenedor `cron`. Sin cron no hay reinicio
+horario ni avance automático de estados de pedidos.
+
+Para levantar la misma instancia en local (usa los puertos 4200 y 8091):
+
+```bash
+ci/toolshop/start.sh
+```
+
+```bash
+BASE_URL=http://localhost:4200 API_URL=http://localhost:8091 ./gradlew test
+```
+
+```bash
+docker compose -f ci/toolshop/docker-compose.yml down
+```
 
 Para ejecutarlo hay que crear el secreto **`TOOLSHOP_ADMIN_PASSWORD`** en el
-repositorio. Lanzado a mano, el workflow acepta una expresión de etiquetas, por
-ejemplo `smoke`.
+repositorio (la instancia de Docker siembra la misma cuenta de administrador que
+el sitio público). Lanzado a mano, el workflow acepta una expresión de
+etiquetas, por ejemplo `smoke`.
 
 ## Cobertura
 
@@ -233,6 +263,11 @@ ejecuciones seguidas** antes de cerrarse.
 
 ## Riesgos conocidos
 
+- **Cloudflare en el sitio público.** Desde IPs de datacenter (como las de
+  GitHub Actions) el sitio público puede responder con la verificación de
+  Cloudflare en lugar de la aplicación. Por eso el CI usa Toolshop en Docker.
+  Las ejecuciones locales contra el sitio público funcionan desde una conexión
+  residencial.
 - **Reinicio horario.** La base de datos de producción se reinicia cada hora
   (`migrate:fresh --seed` en `Kernel.php`; el README de la app no lo menciona).
   Una ejecución que cruce el minuto 0 puede fallar porque los IDs y los usuarios
